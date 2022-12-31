@@ -63,7 +63,7 @@ To setup your environment and getting it up and running, ensure you have both th
 18) Click again the `Guest Student` button and view the log message in the terminal, you should see empty brackets but instead dummy data appear
 19) To view the database changing when you perform a post request, we can use pgAdmin 4 to perform an SQL query on the table. In pgAdmin 4 follow the following path:
 
-Right Side Menu
+Left Side Menu
 `Servers -> PostgresSQL 15 -> Databases -> postgres -> Schemas -> public -> Tables -> Right Click GPSData -> Under Scripts Dropdown Click SELECT Script`
 Right Window 
 `Click the Run Button`
