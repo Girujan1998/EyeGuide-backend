@@ -58,3 +58,16 @@ To setup your environment and getting it up and running, ensure you have both th
 13) If you navigate to `<ngrok-url>/admin` and login with your superuser credentials, you should be able to see tables and clicking one should make it editable for the data within
 14) Open another VS Code instance for the `Capstone` repo and open a terminal in the new VS Code
 15) Run `npm run android` to start up the app on your mobile device or virtual machine (this setup has not been verified using VM to connect to Django server and Postgres database
+16) In the app, click the `Guest Student` button and view the GET request log in the terminal, you should not view any errors and view a log message of `{}` since there is nothing to fetch as the table is empty
+17) In the app, click the `Post Request` button and view the POST request log in the terminal, you should not view any errors
+18) Click again the `Guest Student` button and view the log message in the terminal, you should see empty brackets but instead dummy data appear
+19) To view the database changing when you perform a post request, we can use pgAdmin 4 to perform an SQL query on the table. In pgAdmin 4 follow the following path:
+
+Right Side Menu
+`Servers -> PostgresSQL 15 -> Databases -> postgres -> Schemas -> public -> Tables -> Right Click GPSData -> Under Scripts Dropdown Click SELECT Script`
+Right Window 
+`Click the Run Button`
+
+You should be able to view data appear at the bottom after clicking Run. Click the `Post Request` button again in the app and re-run the query in pgAdmin 4 to view data being populated again
+
+Any issues with setting up your environment, please contact @Girujan1998 for assistance.
