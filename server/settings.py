@@ -17,6 +17,7 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Get variables from environment file
 load_dotenv(os.path.join(BASE_DIR, ".env.development"))
 
 # Quick-start development settings - unsuitable for production
