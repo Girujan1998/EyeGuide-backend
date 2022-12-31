@@ -70,4 +70,4 @@ Right Window
 
 You should be able to view data appear at the bottom after clicking Run. Click the `Post Request` button again in the app and re-run the query in pgAdmin 4 to view data being populated again
 
-Any issues with setting up your environment, please contact @Girujan1998 for assistance.
+Any issues with setting up your environment, please contact Girujan for assistance.
