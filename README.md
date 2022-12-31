@@ -56,4 +56,5 @@ To setup your environment and getting it up and running, ensure you have both th
 11) Run `python manage.py createsuperuser` and create a superuser
 12) Run `python manage.py runserver` to start up the Django server on your local machine
 13) If you navigate to `<ngrok-url>/admin` and login with your superuser credentials, you should be able to see tables and clicking one should make it editable for the data within
-14) Open another VS Code instance for 
+14) Open another VS Code instance for the `Capstone` repo and open a terminal in the new VS Code
+15) Run `npm run android` to start up the app on your mobile device or virtual machine (this setup has not been verified using VM to connect to Django server and Postgres database
