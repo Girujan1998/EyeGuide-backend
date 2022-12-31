@@ -52,8 +52,8 @@ To setup your environment and getting it up and running, ensure you have both th
 7) Run the following `ngrok http 8000` and copy the `https` ngrok URL and replace the URL in both .env files (ensure you don't add the https part for certain variables and add it for the other ones)
 8) Open another terminal in VS Code and run `source capstone-env/bin/activate` to start up a virtual env terminal (when running code for the Django backend, ensure you are running in a virtual machine to avoid issues due to your own machine. 
 9) Run `npm install -r requirements.txt`
-10) Run `python manage.py runserver` to start up the Django server on your local machine
-11) 
-
-
-5) 
+10) Run `python manage.py makemigrations` and then run `python manage.py migrate` to create your table in the database
+11) Run `python manage.py createsuperuser` and create a superuser
+12) Run `python manage.py runserver` to start up the Django server on your local machine
+13) If you navigate to `<ngrok-url>/admin` and login with your superuser credentials, you should be able to see tables and clicking one should make it editable for the data within
+14) Open another VS Code instance for 
