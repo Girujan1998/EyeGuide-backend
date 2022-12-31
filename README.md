@@ -28,8 +28,32 @@ Postman is a software that allows us to interact with our Django server using AP
 
 ### NGROK
 
-NGROK is a software that creates a tunnel that allow you to access you localhost with a public URL that others can use. An example of this commonly seen is when you want someone remotley to view or test your changes that currently are running on your local machines. We are not able to share our localhost URL but we can use NGROK to create a tunnel to a public NGROK url that we can send to the person that will forward the user to your localhost. Additionally, we are using NGROK to avoid a network error when trying to do API calls with our localhost API URL and we can potentially use NGROK to temporarily get around deploying our project and use a local db and server instance running connected to a NGROK tunnel. 
+NGROK is a software that creates a tunnel that allow you to access you localhost with a public URL that others can use. An example of this commonly seen is when you want someone remotley to view or test your changes that currently are running on your local machines. We are not able to share our localhost URL but we can use NGROK to create a tunnel to a public NGROK url that we can send to the person that will forward the user to your localhost. Additionally, we are using NGROK to avoid a network error when trying to do API calls with our localhost API URL and we can potentially use NGROK to temporarily get around deploying our project and use a local db and server instance running connected to a NGROK tunnel. You can download NGROK and how to set it up from here https://ngrok.com/download.
 
-## Setting Up Your Environemnt
+## Setting Up and Running Your Environemnt
+
+To setup your environment and getting it up and running, ensure you have both the `Capstone` and `capstone-backend` repos cloned. 
+
+1) Open Postgres SQL software and start the server
+
+<img width="598" alt="Screen Shot 2022-12-31 at 2 51 28 AM" src="https://user-images.githubusercontent.com/24899889/210129679-6546ff93-d062-41d8-a869-f4ff7183aaee.png">
+
+2) Open pgAdmin 4
+3) Login with the main password (if you have not created one, make one and login)
+4) Register a Postgres server with the following details
+
+`General -> Name = PostgreSQL 15`
+`Connection -> Host name/address = localhost`
+`Connection -> Post = 5432`
+`Connection -> Username = postgres`
+
+5) Connect to your newly registered database
+6) Open VS Code in your local `capstone-backend` repo and open a terminal in VS Code
+7) Run the following `ngrok http 8000` and copy the `https` ngrok URL and replace the URL in both .env files (ensure you don't add the https part for certain variables and add it for the other ones)
+8) Open another terminal in VS Code and run `source capstone-env/bin/activate` to start up a virtual env terminal (when running code for the Django backend, ensure you are running in a virtual machine to avoid issues due to your own machine. 
+9) Run `npm install -r requirements.txt`
+10) Run `python manage.py runserver` to start up the Django server on your local machine
+11) 
 
 
+5) 
