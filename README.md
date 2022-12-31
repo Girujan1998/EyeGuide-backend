@@ -32,7 +32,7 @@ NGROK is a software that creates a tunnel that allow you to access you localhost
 
 ## Setting Up and Running Your Environemnt
 
-To setup your environment and getting it up and running, ensure you have both the `Capstone` and `capstone-backend` repos cloned. 
+To setup your environment and getting it up and running, ensure you have both the `Capstone` and `capstone-backend` repos cloned and you have downloading the environemnt files for each repo from the Google Drive. 
 
 1) Open Postgres SQL software and start the server
 
