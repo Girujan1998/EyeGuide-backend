@@ -20,4 +20,4 @@ Postgres SQL is the database we are using to store our GPS data and will be what
 
 ### pgAdmin4 
 
-pgAdmin 4
+pgAdmin 4 is a software that allows us to interact with our local instance of Postgres SQL database using a UI instead of API calls or a terminal. This would allow us to imporve overall efficency, development, and testing as we can quickly query the database and make quick modifications to the data. Additionally, we could upload data in CSV files and export data more quickly compared to writing SQL queries and using API calls. 
