@@ -51,8 +51,8 @@ To setup your environment and getting it up and running, ensure you have both th
 6) Open VS Code in your local `capstone-backend` repo and open a terminal in VS Code
 7) Run the following `ngrok http 8000` and copy the `https` ngrok URL and replace the URL in both .env files (ensure you don't add the https part for certain variables and add it for the other ones)
 8) If on Mac: Open another terminal in VS Code and run `source capstone-env/bin/activate` to start up a virtual env terminal (when running code for the Django backend, ensure you are running in a virtual machine to avoid issues due to your own machine. 
-If on Windows: Open another terminal in VS Code and `py -m venv env` and then cd into `env/Scripts` and run `./activate` to start a terminal.
-9) Run `npm install -r requirements.txt`
+If on Windows: Open another terminal in VS Code and `py -m venv env` and then cd into `env/Scripts` and run `./activate` to start a terminal then redirect back to `capstone-backend` directory by running `cd ../..`. (Do not commit the `env` folder to Github)
+9) Run `pip install -r requirements.txt`
 10) Run `python manage.py makemigrations` and then run `python manage.py migrate` to create your table in the database
 11) Run `python manage.py createsuperuser` and create a superuser
 12) Run `python manage.py runserver` to start up the Django server on your local machine
