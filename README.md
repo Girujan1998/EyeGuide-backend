@@ -49,7 +49,7 @@ To setup your environment and getting it up and running, ensure you have both th
 
 5) Connect to your newly registered database
 6) Open VS Code in your local `capstone-backend` repo and open a terminal in VS Code
-7) Run the following `ngrok http 8000` and copy the `https` ngrok URL and replace the URL in both .env files (ensure you don't add the https part for certain variables and add it for the other ones)
+7) Run the following `ngrok http 8000` and copy the `https` ngrok URL and replace the URL in both .env files with no spaces (ensure you don't add the https part for certain variables and add it for the other ones) (If you are running this on Windows, you may have a password to login to your Postgres DB in pgAdmin4, you will need to add that pass to the env variable `PGPASSWORD` in `.env.development` for `capstone-backend` repo
 8) If on Mac: Open another terminal in VS Code and run `source capstone-env/bin/activate` to start up a virtual env terminal (when running code for the Django backend, ensure you are running in a virtual machine to avoid issues due to your own machine. 
 If on Windows: Open another terminal in VS Code and `py -m venv env` and then cd into `env/Scripts` and run `./activate` to start a terminal then redirect back to `capstone-backend` directory by running `cd ../..`. (Do not commit the `env` folder to Github)
 9) Run `pip install -r requirements.txt` then run `pip freeze` and you should see all the packages listed in `requirements.txt` appear after running `pip freeze`
