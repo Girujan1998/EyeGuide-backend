@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import StoreGPSData
+from .models import StoreCornerCordsData
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -30,5 +31,35 @@ class GPSView(APIView):
         
         if len(bad_gpsItems) > 0:
             return Response({"INVALID GPS DATA": bad_gpsItems}, status=200)
+        else:
+            return Response(status=200)
+
+class CornerCordsView(APIView):
+    def get(self, request, format=None):
+        gpsCornerCordDict = {}
+
+        try:
+            gpsCornerCordObjects = StoreCornerCordsData.objects.all()
+    
+            for gpsCornerCordItem in gpsCornerCordObjects:
+                gpsCornerCordDict[gpsCornerCordItem.buildingName] = gpsCornerCordItem.cornerCords
+
+            return Response(gpsCornerCordDict, status=200)
+        except:
+            return Response(status=404)
+
+    def post(self, request, format=None):
+        gpsCornerCordItems = request.data['gpsCornerCord']
+        bad_gpsCornerCordItems = []
+
+        for gpsCornerCordItem in gpsCornerCordItems:
+            try:
+                new_gpsCornerCordItem = StoreCornerCordsData(buildingName=gpsCornerCordItem['buildingName'], cornerCords=gpsCornerCordItem['cornerCords'])
+                new_gpsCornerCordItem.save()
+            except:
+                bad_gpsCornerCordItems.append(gpsCornerCordItem)
+        
+        if len(bad_gpsCornerCordItems) > 0:
+            return Response({"INVALID GPS CORNER CORD DATA": bad_gpsCornerCordItems}, status=200)
         else:
             return Response(status=200)
