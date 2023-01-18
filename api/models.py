@@ -10,3 +10,13 @@ class StoreGPSData(models.Model) :
 
     class Meta:
         db_table = 'GPS_DATA'
+
+class StoreCornerCordsData(models.Model) :
+    buildingName = models.CharField(max_length=100)
+    cornerCords = JSONField()
+
+    def __str__(self):
+        return self.buildingName
+
+    class Meta:
+        db_table = 'GPS_CORNER_CORD'
