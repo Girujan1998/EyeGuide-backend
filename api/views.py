@@ -52,26 +52,19 @@ class CornerCordsView(APIView):
     def post(self, request, format=None):
         gpsCornerCordItems = request.data['gpsCornerCord']
         bad_gpsCornerCordItems = []
-        print(gpsCornerCordItems)
-        print(gpsCornerCordItems[0]['buildingName'])
-        print(StoreCornerCordsData.objects.all())
-        print(StoreCornerCordsData.objects.get(buildingName='1a'))
 
-        try:
-            gpsCornerCordObjects = StoreCornerCordsData.objects.get(buildingName=gpsCornerCordItems[0]['buildingName'])
-            print("here" + gpsCornerCordObjects)
-            gpsCornerCordObjects.cornerCords = gpsCornerCordItems[0]['cornerCords']
-            print("here2" + gpsCornerCordObjects.cornerCords)
-            gpsCornerCordObjects.save()
-            print("here3")
-        except:
-            print("here4")
+        existingItems = StoreCornerCordsData.objects.all().filter(buildingName=gpsCornerCordItems[0]['buildingName'])
+        if len(existingItems) == 0:
             for gpsCornerCordItem in gpsCornerCordItems:
                 try:
                     new_gpsCornerCordItem = StoreCornerCordsData(buildingName=gpsCornerCordItem['buildingName'], cornerCords=gpsCornerCordItem['cornerCords'])
                     new_gpsCornerCordItem.save()
                 except:
                     bad_gpsCornerCordItems.append(gpsCornerCordItem)
+        else:
+            gpsCornerCordObjects = existingItems[0]
+            gpsCornerCordObjects.cornerCords = gpsCornerCordItems[0]['cords']['cornerCords']
+            gpsCornerCordObjects.save()
 
         if len(bad_gpsCornerCordItems) > 0:
             return Response({"INVALID GPS CORNER CORD DATA": bad_gpsCornerCordItems}, status=200)
