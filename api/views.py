@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from .models import StoreGPSData
 from .models import StoreCornerCordsData
+from .models import StoreNodeData
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -68,5 +69,38 @@ class CornerCordsView(APIView):
 
         if len(bad_gpsCornerCordItems) > 0:
             return Response({"INVALID GPS CORNER CORD DATA": bad_gpsCornerCordItems}, status=200)
+        else:
+            return Response(status=200)
+
+
+class NodeView(APIView):
+    def get(self, request, format=None):
+        nodeBuildingName = request.query_params['buildingName']
+        nodeFloorNumber = request.query_params['floorNumber']
+
+        try:
+            nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName, floorNumber=nodeFloorNumber)
+            if len(nodeObjects) == 0:
+                 return Response({}, status=200)
+
+            return Response(nodeObjects[0].nodes, status=200)
+        except:
+            return Response(status=404)
+
+    def post(self, request, format=None):
+        nodeItem = request.data['node']
+        bad_nodeItems = []
+
+        # fourCornerItems = StoreCornerCordsData.objects.all().filter(buildingName=nodeItem['buildingName'])
+
+
+        try:
+            new_nodeItem = StoreNodeData(buildingName=nodeItem['buildingName'], floorNumber=nodeItem['floorNumber'], nodes=nodeItem['nodes'])
+            new_nodeItem.save()
+        except:
+            bad_nodeItems.append(nodeItem)
+        
+        if len(bad_nodeItems) > 0:
+            return Response({"INVALID NODE DATA": bad_nodeItems}, status=200)
         else:
             return Response(status=200)
