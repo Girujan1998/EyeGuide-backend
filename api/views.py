@@ -5,6 +5,10 @@ from .models import StoreGPSData
 from .models import StoreCornerCordsData
 from .models import StoreNodeData
 
+import sys
+sys.path.append("..")
+from scripts import coordinateMath
+
 class GPSView(APIView):
     def get(self, request, format=None):
         gpsDict = {}
@@ -79,7 +83,7 @@ class NodeView(APIView):
         nodeFloorNumber = request.query_params['floorNumber']
 
         try:
-            nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName, floorNumber=nodeFloorNumber)
+            nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
             if len(nodeObjects) == 0:
                  return Response({}, status=200)
 
@@ -91,9 +95,9 @@ class NodeView(APIView):
         nodeItem = request.data['node']
         bad_nodeItems = []
 
-        # fourCornerItems = StoreCornerCordsData.objects.all().filter(buildingName=nodeItem['buildingName'])
-
-
+        fourCornerItems = StoreCornerCordsData.objects.all().filter(buildingName=nodeItem['buildingName'])
+        print("OKASOAKSOKASO")
+        coordinateMath.main(fourCornerItems, nodeItem)
         try:
             new_nodeItem = StoreNodeData(buildingName=nodeItem['buildingName'], floorNumber=nodeItem['floorNumber'], nodes=nodeItem['nodes'])
             new_nodeItem.save()

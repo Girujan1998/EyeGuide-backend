@@ -1,11 +1,9 @@
-def main(fourCornerArray, nodeLocations):
+def main():
     print('Main function called.')
-    print("fourCornerArray: ", fourCornerArray)
-    print("nodeLocations: ", nodeLocations)
+
     conversionStyle = ["xToLong", "xToLat"]
 
     listOfGestures = []
-    newGpsArr = []
 
     gpsArr = []
 
@@ -28,24 +26,24 @@ def main(fourCornerArray, nodeLocations):
 
     conversion, xConvert, yConvert = calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, bottomLeftIndex)
 
-    
+    newGpsArr = []
     if conversion == conversionStyle[0]:
         # convert x gestures to longtitudes and y gestures to latitudes
         for gesture in listOfGestures:
             diffX = gesture.x - gesturePos[topLeftIndex].x
             diffY = gesture.y - gesturePos[topLeftIndex].y
-            newLong = gpsArr[topLeftIndex]['long'] + diffX * xConvert
-            newLat = gpsArr[topLeftIndex]['lat'] + diffY * yConvert
-            insertToList(newGpsArr, newLong, newLat)
+            newGPSx = gpsArr[topLeftIndex]['long'] + diffX * xConvert
+            newGPSy = gpsArr[topLeftIndex]['lat'] + diffY * yConvert
+            insertToList(newGpsArr, newGPSx, newGPSy)
         
     else:
         # convert x gestures to latitudes and y gestures to longtitudes
         for gesture in listOfGestures:
             diffX = gesture.x - gesturePos[topLeftIndex].x
             diffY = gesture.y - gesturePos[topLeftIndex].y
-            newLat = gpsArr[topLeftIndex]['lat'] + diffX * xConvert
-            newLong = gpsArr[topLeftIndex]['long'] + diffY * yConvert
-            insertToList(newGpsArr, newLong, newLat)
+            newGPSx = gpsArr[topLeftIndex]['lat'] + diffX * xConvert
+            newGPSy = gpsArr[topLeftIndex]['long'] + diffY * yConvert
+            insertToList(newGpsArr, newGPSy, newGPSx)
 
 
 
@@ -149,8 +147,8 @@ def calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, b
     #             maxLat = currLatDiff
     #             maxLatPair = [i,j]
     
-    xGestureDiff = abs(gesturePos[topLeftIndex] - gesturePos[topRightIndex])
-    yGestureDiff = abs(gesturePos[topLeftIndex] - gesturePos[bottomLeftIndex])
+    yGestureDiff = abs(gesturePos[topLeftIndex] - gesturePos[topRightIndex])
+    xGestureDiff = abs(gesturePos[topLeftIndex] - gesturePos[bottomLeftIndex])
 
     xToLongValue = abs(gpsArr[topLeftIndex]['long'] - gpsArr[topRightIndex]['long'])
     xToLatValue = abs(gpsArr[topLeftIndex]['lat'] - gpsArr[topRightIndex]['lat'])
@@ -158,13 +156,13 @@ def calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, b
 
     if xToLongValue > xToLatValue:
         # convert x to longtitute, y to latitude
-        xGestureToLongConversion = xToLongValue/xGestureDiff
-        yGestureToLatConversion = (abs(gpsArr[topLeftIndex]['lat'] - gpsArr[bottomLeftIndex]['lat']))/yGestureDiff
+        xGestureToLongConversion = xGestureDiff/xToLongValue
+        yGestureToLatConversion = yGestureDiff/(abs(gpsArr[topLeftIndex]['lat'] - gpsArr[bottomLeftIndex]['lat']))
         return ["xToLong", xGestureToLongConversion, yGestureToLatConversion]
     else:
         # convert y to longtitude, x to latitude
-        xGestureToLatConversion = xToLatValue/xGestureDiff
-        yGestureToLongConversion = (abs(gpsArr[topLeftIndex]['long'] - gpsArr[bottomLeftIndex]['long']))/yGestureDiff
+        xGestureToLatConversion = xGestureDiff/xToLatValue
+        yGestureToLongConversion = yGestureDiff/(abs(gpsArr[topLeftIndex]['long'] - gpsArr[bottomLeftIndex]['long']))
         return ["xToLat", xGestureToLatConversion, yGestureToLongConversion]
 
     
