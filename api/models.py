@@ -23,7 +23,7 @@ class StoreCornerCordsData(models.Model) :
 
 class StoreNodeData(models.Model) :
     buildingName = models.CharField(max_length=100)
-    floorNumber = models.CharField(max_length=100)
+    floorName = models.CharField(max_length=100)
     nodes = JSONField()
 
     def __str__(self):

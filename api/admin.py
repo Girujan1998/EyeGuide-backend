@@ -11,7 +11,7 @@ class StoreCornerCordsDataAdmin(admin.ModelAdmin):
     list_display = ('buildingName', 'cornerCords')
 
 class StoreNodeDataAdmin(admin.ModelAdmin):
-    list_display = ('buildingName', 'floorNumber', 'nodes')
+    list_display = ('buildingName', 'floorName', 'nodes')
 
 admin.site.register(StoreGPSData, StoreGPSDataAdmin)
 admin.site.register(StoreCornerCordsData, StoreCornerCordsDataAdmin)
