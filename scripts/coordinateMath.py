@@ -1,119 +1,31 @@
-def main():
-    print('Main function called.')
+def findGPSCoordinates(fourCornerArray, listOfGestures):
 
-    # stores the list of gesture locations of all placed nodes
-    listOfGestures = []
-
-    # stores the newly generated gps coordinates
-    newGpsArr = []
-
-    # stores the four corners' gps locations
-    gpsArr = []
-
-    insertToList(gpsArr, 43.474638, -80.545803)  # Top Left
-    insertToList(gpsArr, 43.475416, -80.54362)   # Top Right
-    insertToList(gpsArr, 43.475079, -80.543384)  # Bottom Right
-    insertToList(gpsArr, 43.474301, -80.545574)  # Bottom Left
-
-    # stores the four corners' gesture locations
-    gesturePos = []
-
-    insertGesturePos(gesturePos, 1, 1)   # Top Left
-    insertGesturePos(gesturePos, 13, 1)  # Top Right
-    insertGesturePos(gesturePos, 13, 6)  # Bottom Right
-    insertGesturePos(gesturePos, 1, 6)   # Bottom Left
+    gpsArr = fourCornerArray[0].cornerCords
 
     # gets the index of the top left, top right, and bottom left nodes
-    topLeftIndex = topLeftNode(gesturePos)
-    topRightIndex = topRightNode(gesturePos)
-    bottomLeftIndex = bottomLeftNode(gesturePos)
+    topLeftIndex = topLeftNode(gpsArr)
+    topRightIndex = topRightNode(gpsArr)
+    bottomLeftIndex = bottomLeftNode(gpsArr)
 
     # calculates the ratio of meters to gesture coordinates (units are m/gesture)
-    xLongRatio, xLatRatio, yLongRatio, yLatRatio = calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, bottomLeftIndex)
+    xLongRatio, xLatRatio, yLongRatio, yLatRatio = calcLongAndLatConversions(gpsArr, topLeftIndex, topRightIndex, bottomLeftIndex)
 
     # iterates through all gestures
     for gesture in listOfGestures:
         # calculates the difference in gesture positioning between the top left corner and the current gesture
-        diffX = gesture['x'] - gesturePos[topLeftIndex]['x']
-        diffY = gesture['y'] - gesturePos[topLeftIndex]['y']
+        diffX = gesture['x'] - gpsArr[topLeftIndex]['x']
+        diffY = gesture['y'] - gpsArr[topLeftIndex]['y']
 
         # takes the gps values of the top left corner and adds on the gesture difference times the ratio in both x and y
         newLong = gpsArr[topLeftIndex]['long'] + (diffX * xLongRatio) + (diffY * yLongRatio)
         newLat = gpsArr[topLeftIndex]['lat'] + (diffX * xLatRatio) + (diffY * yLatRatio)
 
         # adds gps coordinate to the newGPSArr list
-        insertToList(newGpsArr, newLong, newLat)
+        gesture['lat'] = newLat
+        gesture['long'] = newLong
+
+    return listOfGestures
     
-    # prints out all gps coordinates
-    for gps in newGpsArr:
-        print(gps["long"], ",", gps["lat"])
-
-
-
-    # G's code!!!
-
-    # x = 72  # Gesture X Location
-    # y = 33  # Gesture Y Location
-
-    # xDistance = 194
-    # yDistance = 40
-
-    # newLong1, newLat1 = getNewGPSCord(gpsArr, 3, 0, yDistance, y)
-    # newLong2, newLat2 = getNewGPSCord(gpsArr, 0, 1, xDistance, x)
-
-    # print(newLong1, newLat1)
-    # print(newLong2, newLat2)
-
-    # newLong = 0
-    # newLat = 0
-
-    # # newLong = newLong1 - newLong2 
-    # # newLat = newLat1 - newLat2
-
-    # newLong = -newLong1 + newLong2 
-    # newLat = newLat1 + newLat2
-
-    # # If Top Right Was Middle Node
-    # newLong = -newLong1 - newLong2 
-    # newLat = -newLat1 + newLat2
-
-    # print(str(gpsArr[0]['long'] + newLong) + ',' + str(gpsArr[0]['lat'] + newLat))
-
-def findGPSCoordinates(gpsArr, gesturePos, listOfGestures):
-
-    # stores the newly generated gps coordinates
-    newGpsArr = []
-
-    # gpsArr has 4 corner gps data
-    # gesturePos has 4 corner gesture data
-    # listOfGestures has just the gestures
-
-    # gets the index of the top left, top right, and bottom left nodes
-    topLeftIndex = topLeftNode(gesturePos)
-    topRightIndex = topRightNode(gesturePos)
-    bottomLeftIndex = bottomLeftNode(gesturePos)
-
-    # calculates the ratio of meters to gesture coordinates (units are m/gesture)
-    xLongRatio, xLatRatio, yLongRatio, yLatRatio = calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, bottomLeftIndex)
-
-    # iterates through all gestures
-    for gesture in listOfGestures:
-        # calculates the difference in gesture positioning between the top left corner and the current gesture
-        diffX = gesture['x'] - gesturePos[topLeftIndex]['x']
-        diffY = gesture['y'] - gesturePos[topLeftIndex]['y']
-
-        # takes the gps values of the top left corner and adds on the gesture difference times the ratio in both x and y
-        newLong = gpsArr[topLeftIndex]['long'] + (diffX * xLongRatio) + (diffY * yLongRatio)
-        newLat = gpsArr[topLeftIndex]['lat'] + (diffX * xLatRatio) + (diffY * yLatRatio)
-
-        # adds gps coordinate to the newGPSArr list
-        insertToList(newGpsArr, newLong, newLat)
-    
-    # prints out all gps coordinates
-    for gps in newGpsArr:
-        print(gps["long"], ",", gps["lat"])
-
-    return newGpsArr
 
 def topLeftNode(gesturePos):
     for i in range(len(gesturePos)):
@@ -164,10 +76,10 @@ def topRightNode(gesturePos):
     return -1
 
 
-def calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, bottomLeftIndex):
+def calcLongAndLatConversions(gpsArr, topLeftIndex, topRightIndex, bottomLeftIndex):
     
-    xGestureDiff = abs(gesturePos[topLeftIndex]['x'] - gesturePos[topRightIndex]['x'])
-    yGestureDiff = abs(gesturePos[topLeftIndex]['y'] - gesturePos[bottomLeftIndex]['y'])
+    xGestureDiff = abs(gpsArr[topLeftIndex]['x'] - gpsArr[topRightIndex]['x'])
+    yGestureDiff = abs(gpsArr[topLeftIndex]['y'] - gpsArr[bottomLeftIndex]['y'])
 
     xToLongValue = (gpsArr[topRightIndex]['long'] - gpsArr[topLeftIndex]['long'])
     xToLatValue = (gpsArr[topRightIndex]['lat'] - gpsArr[topLeftIndex]['lat'])
@@ -182,43 +94,3 @@ def calcLongAndLatConversions(gpsArr, gesturePos, topLeftIndex, topRightIndex, b
 
     return [xLongConversion, xLatConversion, yLongConversion, yLatConversion]
     
-
-
-# Getting New Long And Lat For Gesture Position
-def getNewGPSCord(gpsArr, firstIndex, secondIndex, dist, gestLoc):
-    longDiff = gpsArr[firstIndex]['long'] - gpsArr[secondIndex]['long']
-    latDiff = gpsArr[firstIndex]['lat'] - gpsArr[secondIndex]['lat']
-
-    longRatio = longDiff / dist
-    latRatio = latDiff / dist
-
-    longValue = (gestLoc - 1) * longRatio
-    latValue = (gestLoc - 1) * latRatio
-
-    newLong = longValue
-    newLat = latValue
-
-    print(newLong, newLat)
-
-    return abs(newLong), abs(newLat)
-
-# Insert GPS Coord Into List
-def insertToList(gpsArr, long, lat):
-    gpsArr.append(
-        {
-            'long': long,
-            'lat': lat
-        }
-    )
-
-# Insert Gesture Postion Into List
-def insertGesturePos(gesturePos, x, y):
-    gesturePos.append(
-        {
-            'x': x,
-            'y': y
-        }
-    )
-
-if __name__ == "__main__":
-    main()

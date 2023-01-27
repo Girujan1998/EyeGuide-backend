@@ -95,12 +95,12 @@ class NodeView(APIView):
         nodeItem = request.data['node']
         bad_nodeItems = []
 
-        fourCornerItems = StoreCornerCordsData.objects.all().filter(buildingName=nodeItem['buildingName'], floorName=nodeItem['floorName'])
-        print("OKASOAKSOKASO")
-        # coordinateMath.findGPSCoordinates(gpsArr, gesturePos, listOfGestures) - returns list of gps locations corresponding to listOfGestures (same order)
-        coordinateMath.main()
+        fourCornerItems = StoreCornerCordsData.objects.all().filter(buildingName=nodeItem['buildingName'])
+        
+        convertedList = coordinateMath.findGPSCoordinates(fourCornerItems, nodeItem['nodes'])
+        print(convertedList)
         try:
-            new_nodeItem = StoreNodeData(buildingName=nodeItem['buildingName'], floorName=nodeItem['floorName'], nodes=nodeItem['nodes'])
+            new_nodeItem = StoreNodeData(buildingName=nodeItem['buildingName'], floorName=nodeItem['floorName'], nodes=convertedList)
             new_nodeItem.save()
         except:
             bad_nodeItems.append(nodeItem)
