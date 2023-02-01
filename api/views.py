@@ -8,6 +8,7 @@ from .models import StoreNodeData
 import sys
 sys.path.append("..")
 from scripts import coordinateMath
+from scripts import aStarSearch
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -79,15 +80,17 @@ class CornerCordsView(APIView):
 
 class NodeView(APIView):
     def get(self, request, format=None):
-        nodeBuildingName = request.query_params['buildingName']
-        nodeFloorName = request.query_params['floorName']
+        buildingName = request.query_params['buildingName']
+        floorName = request.query_params['floorName']
+        currentNodeGuid = request.query_params['currentLocation']
+        destinationNodeGuid = request.query_params['destination']
 
+        jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
+        
         try:
-            nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
-            if len(nodeObjects) == 0:
-                 return Response({}, status=200)
+            finalPath = aStarSearch.aStar(jsonNodes['nodes'], currentNodeGuid, destinationNodeGuid)
 
-            return Response(nodeObjects[0].nodes, status=200)
+            return Response({finalPath}, status=200)
         except:
             return Response(status=404)
 
