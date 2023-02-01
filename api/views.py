@@ -79,15 +79,31 @@ class CornerCordsView(APIView):
 
 class NodeView(APIView):
     def get(self, request, format=None):
-        nodeBuildingName = request.query_params['buildingName']
-        nodeFloorName = request.query_params['floorName']
-
+        nodeBuildingName = request.query_params.get('buildingName')
+        nodeFloorName = request.query_params.get('floorName')
         try:
-            nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
-            if len(nodeObjects) == 0:
-                 return Response({}, status=200)
-
-            return Response(nodeObjects[0].nodes, status=200)
+            if nodeBuildingName is not None and nodeFloorName is not None:
+                nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
+                result = nodeObjects[0].nodes
+            else:
+                nodeObjects = StoreNodeData.objects.all()
+                nodes = {}
+                for node in nodeObjects:
+                    if nodes.get(node.buildingName):
+                        nodes[node.buildingName]['floorName'].append(node.floorName)
+                    else:
+                        nodes[node.buildingName] = {
+                            'buildingName': node.buildingName,
+                            'floorName': [node.floorName]
+                            }
+                buildingList = []
+                for buildingName in nodes:
+                    buildingList.append(nodes[buildingName])
+                result = {'nodes': buildingList}
+            if len(result) == 0:
+                return Response({}, status=200)
+            
+            return Response(result, status=200)
         except:
             return Response(status=404)
 
