@@ -88,9 +88,8 @@ class NodeView(APIView):
         jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
         
         try:
-            finalPath = aStarSearch.aStar(jsonNodes['nodes'], currentNodeGuid, destinationNodeGuid)
-
-            return Response({finalPath}, status=200)
+            finalPath = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destinationNodeGuid)
+            return Response(finalPath, status=200)
         except:
             return Response(status=404)
 

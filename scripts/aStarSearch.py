@@ -6,7 +6,7 @@ def aStar(jsonNodes, start, dest):
     # hash stores a constant lookup between guid and the node itself
     hash = genHash(jsonNodes)
 
-    heuristic = genHeuristic(jsonNodes, dest)
+    heuristic = genHeuristic(jsonNodes, hash[dest])
 
     # a star search
 
@@ -14,20 +14,18 @@ def aStar(jsonNodes, start, dest):
     curr = hash[start]
     openList = []
     currCost = 0
-    currPath = [start['guid']]
+    currPath = [start]
 
-    while(curr['guid'] != dest['guid']):
+    while(curr['guid'] != dest):
         
         # add all nodes adjacent to current node to list with each nodes' cost, heuristic, and path
-        
-        for guid in curr['adjList']:
+        for guid in curr['adjacencyList']:
             openList.append({
                 'cost' : currCost + dist(curr, hash[guid]),
-                'heuristic' : heuristic['guid'],
+                'heuristic' : heuristic[guid],
                 'path' : currPath + [guid],
                 'guid' : guid,
             })
-
         # find node in list with lowest cost + heuristic
         minTotalCost = MAX_DISTANCE
 
@@ -37,7 +35,6 @@ def aStar(jsonNodes, start, dest):
                 minElement = openListNode
                 minElementIndex = index
             
-
         # remove lowest cost + heuristic element from list
         openList.pop(minElementIndex)
 
