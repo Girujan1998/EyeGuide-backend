@@ -49,26 +49,25 @@ class CornerCordsView(APIView):
                 gpsCornerCordObjects = StoreCornerCordsData.objects.get(buildingName=gpsCornerCordItems)
             except:
                 return Response({}, status=200)
-
-            return Response({"buildingName": gpsCornerCordObjects.buildingName, "cords": gpsCornerCordObjects.cornerCords}, status=200)
+            
+            return Response({"buildingName": gpsCornerCordObjects.buildingName, "cornerCords": gpsCornerCordObjects.cornerCords}, status=200)
         except:
             return Response(status=404)
 
     def post(self, request, format=None):
-        gpsCornerCordItems = request.data['gpsCornerCord']
+        gpsCornerCordItem = request.data.get('gpsCornerCord')
         bad_gpsCornerCordItems = []
 
-        existingItems = StoreCornerCordsData.objects.all().filter(buildingName=gpsCornerCordItems[0]['buildingName'])
+        existingItems = StoreCornerCordsData.objects.all().filter(buildingName=gpsCornerCordItem['buildingName'])
         if len(existingItems) == 0:
-            for gpsCornerCordItem in gpsCornerCordItems:
-                try:
-                    new_gpsCornerCordItem = StoreCornerCordsData(buildingName=gpsCornerCordItem['buildingName'], cornerCords=gpsCornerCordItem['cornerCords'])
-                    new_gpsCornerCordItem.save()
-                except:
-                    bad_gpsCornerCordItems.append(gpsCornerCordItem)
+            try:
+                new_gpsCornerCordItem = StoreCornerCordsData(buildingName=gpsCornerCordItem['buildingName'], cornerCords=gpsCornerCordItem['cornerCords'])
+                new_gpsCornerCordItem.save()
+            except:
+                bad_gpsCornerCordItems.append(gpsCornerCordItem)
         else:
             gpsCornerCordObjects = existingItems[0]
-            gpsCornerCordObjects.cornerCords = gpsCornerCordItems[0]['cords']['cornerCords']
+            gpsCornerCordObjects.cornerCords = gpsCornerCordItem['cornerCords']
             gpsCornerCordObjects.save()
 
         if len(bad_gpsCornerCordItems) > 0:
