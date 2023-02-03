@@ -8,6 +8,7 @@ from .models import StoreNodeData
 import sys
 sys.path.append("..")
 from scripts import coordinateMath
+from scripts import aStarSearch
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -79,12 +80,18 @@ class CornerCordsView(APIView):
 class NodeView(APIView):
     def get(self, request, format=None):
         getType = request.query_params.get('getType')
-        nodeBuildingName = request.query_params.get('buildingName')
-        nodeFloorName = request.query_params.get('floorName')
+        buildingName = request.query_params.get('buildingName')
+        floorName = request.query_params.get('floorName')
+        currentNodeGuid = request.query_params.get('currentLocation')
+        destinationNodeGuid = request.query_params.get('destination')
+        
         try:
             if getType == 'get-route':
-                nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
-                result = nodeObjects[0].nodes
+                jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
+                
+                finalPath = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destinationNodeGuid)
+                return Response(finalPath, status=200)
+
             elif getType == 'get-buildings':
                 nodeObjects = StoreNodeData.objects.all()
                 nodes = {}
@@ -100,12 +107,11 @@ class NodeView(APIView):
                 for buildingName in nodes:
                     buildingList.append(nodes[buildingName])
                 result = {'nodes': buildingList}
+                return Response(result, status=200)
             elif getType == 'get-building-data':
                 print("1")
-            if len(result) == 0:
-                return Response({}, status=200)
             
-            return Response(result, status=200)
+            return Response(status=404)
         except:
             return Response(status=404)
 
