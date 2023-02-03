@@ -78,13 +78,14 @@ class CornerCordsView(APIView):
 
 class NodeView(APIView):
     def get(self, request, format=None):
+        getType = request.query_params.get('getType')
         nodeBuildingName = request.query_params.get('buildingName')
         nodeFloorName = request.query_params.get('floorName')
         try:
-            if nodeBuildingName is not None and nodeFloorName is not None:
+            if getType == 'get-route':
                 nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
                 result = nodeObjects[0].nodes
-            else:
+            elif getType == 'get-buildings':
                 nodeObjects = StoreNodeData.objects.all()
                 nodes = {}
                 for node in nodeObjects:
@@ -99,6 +100,8 @@ class NodeView(APIView):
                 for buildingName in nodes:
                     buildingList.append(nodes[buildingName])
                 result = {'nodes': buildingList}
+            elif getType == 'get-building-data':
+                print("1")
             if len(result) == 0:
                 return Response({}, status=200)
             
