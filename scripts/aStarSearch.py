@@ -44,7 +44,7 @@ def aStar(jsonNodes, start, dest):
         currCost = minElement['cost']
 
     # currPath should now hold list of guids to follow to get from start to dest
-    return currPath
+    return currPath, currCost
     
 def genHash(jsonNodes):
     hash = {}

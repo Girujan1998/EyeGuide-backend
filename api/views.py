@@ -82,15 +82,29 @@ class NodeView(APIView):
         getType = request.query_params.get('getType')
         buildingName = request.query_params.get('buildingName')
         floorName = request.query_params.get('floorName')
-        currentNodeGuid = request.query_params.get('currentLocation')
-        destinationNodeGuid = request.query_params.get('destination')
+        currentNodeName = request.query_params.get('currentLocation')
+        destinationNodeName = request.query_params.get('destination')
         
         try:
             if getType == 'get-route':
                 jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
                 
-                finalPath = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destinationNodeGuid)
-                return Response(finalPath, status=200)
+                destinationNodeGuidList = []
+                for node in jsonNodes[0].nodes:
+                    if node['name'] == currentNodeName:
+                        currentNodeGuid = node['guid']
+                    if node['name'] == destinationNodeName:
+                        destinationNodeGuidList.append(node['guid'])
+                
+                minCost = 40075017
+                minPath = None
+                for destNodeGuid in destinationNodeGuidList:
+                    path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid)
+                    if cost < minCost:
+                        minCost = cost
+                        minPath = path
+                
+                return Response(minPath, status=200)
 
             elif getType == 'get-buildings':
                 nodeObjects = StoreNodeData.objects.all()
@@ -109,7 +123,30 @@ class NodeView(APIView):
                 result = {'nodes': buildingList}
                 return Response(result, status=200)
             elif getType == 'get-building-data':
-                print("1")
+                nodeObjects = StoreNodeData.objects.all()
+                nodes = {}
+                for node in nodeObjects:
+                    
+                    # filter destination nodes here
+                    filteredNodes = {destinationNode['name'] for destinationNode in node.nodes if destinationNode['type'] == 'DestinationNodeState'}
+                    if nodes.get(node.buildingName):
+                        nodes[node.buildingName]['floorNames'].append(node.floorName)
+                        nodes[node.buildingName]['destinationNodes'].append(filteredNodes)
+                    else:
+                        nodes[node.buildingName] = {
+                            'buildingName': node.buildingName,
+                            'floorNames': [node.floorName],
+                            'destinationNodes': [filteredNodes]
+                            }
+                print("after loop")
+                buildingList = []
+                
+                # buildingList = [nodes[buildingName] for buildingName in node]
+                for buildingName in nodes:
+                    buildingList.append(nodes[buildingName])
+                result = {'nodes': buildingList}
+                print(result)
+                return Response(result, status=200)
             
             return Response(status=404)
         except:
