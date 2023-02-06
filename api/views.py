@@ -8,6 +8,7 @@ from .models import StoreNodeData
 import sys
 sys.path.append("..")
 from scripts import coordinateMath
+from scripts import aStarSearch
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -49,26 +50,25 @@ class CornerCordsView(APIView):
                 gpsCornerCordObjects = StoreCornerCordsData.objects.get(buildingName=gpsCornerCordItems)
             except:
                 return Response({}, status=200)
-
-            return Response({"buildingName": gpsCornerCordObjects.buildingName, "cords": gpsCornerCordObjects.cornerCords}, status=200)
+            
+            return Response({"buildingName": gpsCornerCordObjects.buildingName, "cornerCords": gpsCornerCordObjects.cornerCords}, status=200)
         except:
             return Response(status=404)
 
     def post(self, request, format=None):
-        gpsCornerCordItems = request.data['gpsCornerCord']
+        gpsCornerCordItem = request.data.get('gpsCornerCord')
         bad_gpsCornerCordItems = []
 
-        existingItems = StoreCornerCordsData.objects.all().filter(buildingName=gpsCornerCordItems[0]['buildingName'])
+        existingItems = StoreCornerCordsData.objects.all().filter(buildingName=gpsCornerCordItem['buildingName'])
         if len(existingItems) == 0:
-            for gpsCornerCordItem in gpsCornerCordItems:
-                try:
-                    new_gpsCornerCordItem = StoreCornerCordsData(buildingName=gpsCornerCordItem['buildingName'], cornerCords=gpsCornerCordItem['cornerCords'])
-                    new_gpsCornerCordItem.save()
-                except:
-                    bad_gpsCornerCordItems.append(gpsCornerCordItem)
+            try:
+                new_gpsCornerCordItem = StoreCornerCordsData(buildingName=gpsCornerCordItem['buildingName'], cornerCords=gpsCornerCordItem['cornerCords'])
+                new_gpsCornerCordItem.save()
+            except:
+                bad_gpsCornerCordItems.append(gpsCornerCordItem)
         else:
             gpsCornerCordObjects = existingItems[0]
-            gpsCornerCordObjects.cornerCords = gpsCornerCordItems[0]['cords']['cornerCords']
+            gpsCornerCordObjects.cornerCords = gpsCornerCordItem['cornerCords']
             gpsCornerCordObjects.save()
 
         if len(bad_gpsCornerCordItems) > 0:
@@ -79,15 +79,76 @@ class CornerCordsView(APIView):
 
 class NodeView(APIView):
     def get(self, request, format=None):
-        nodeBuildingName = request.query_params['buildingName']
-        nodeFloorName = request.query_params['floorName']
-
+        getType = request.query_params.get('getType')
+        buildingName = request.query_params.get('buildingName')
+        floorName = request.query_params.get('floorName')
+        currentNodeName = request.query_params.get('currentLocation')
+        destinationNodeName = request.query_params.get('destination')
+        
         try:
-            nodeObjects = StoreNodeData.objects.all().filter(buildingName=nodeBuildingName)
-            if len(nodeObjects) == 0:
-                 return Response({}, status=200)
+            if getType == 'get-route':
+                jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
+                
+                destinationNodeGuidList = []
+                for node in jsonNodes[0].nodes:
+                    if node['name'] == currentNodeName:
+                        currentNodeGuid = node['guid']
+                    if node['name'] == destinationNodeName:
+                        destinationNodeGuidList.append(node['guid'])
+                
+                minCost = 40075017
+                minPath = None
+                for destNodeGuid in destinationNodeGuidList:
+                    path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid)
+                    if cost < minCost:
+                        minCost = cost
+                        minPath = path
+                
+                return Response(minPath, status=200)
 
-            return Response(nodeObjects[0].nodes, status=200)
+            elif getType == 'get-buildings':
+                nodeObjects = StoreNodeData.objects.all()
+                nodes = {}
+                for node in nodeObjects:
+                    if nodes.get(node.buildingName):
+                        nodes[node.buildingName]['floorName'].append(node.floorName)
+                    else:
+                        nodes[node.buildingName] = {
+                            'buildingName': node.buildingName,
+                            'floorName': [node.floorName]
+                            }
+                buildingList = []
+                for buildingName in nodes:
+                    buildingList.append(nodes[buildingName])
+                result = {'nodes': buildingList}
+                return Response(result, status=200)
+            elif getType == 'get-building-data':
+                nodeObjects = StoreNodeData.objects.all()
+                nodes = {}
+                for node in nodeObjects:
+                    
+                    # filter destination nodes here
+                    filteredNodes = {destinationNode['name'] for destinationNode in node.nodes if destinationNode['type'] == 'DestinationNodeState'}
+                    if nodes.get(node.buildingName):
+                        nodes[node.buildingName]['floorNames'].append(node.floorName)
+                        nodes[node.buildingName]['destinationNodes'].append(filteredNodes)
+                    else:
+                        nodes[node.buildingName] = {
+                            'buildingName': node.buildingName,
+                            'floorNames': [node.floorName],
+                            'destinationNodes': [filteredNodes]
+                            }
+                print("after loop")
+                buildingList = []
+                
+                # buildingList = [nodes[buildingName] for buildingName in node]
+                for buildingName in nodes:
+                    buildingList.append(nodes[buildingName])
+                result = {'nodes': buildingList}
+                print(result)
+                return Response(result, status=200)
+            
+            return Response(status=404)
         except:
             return Response(status=404)
 
