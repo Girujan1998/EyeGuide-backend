@@ -9,6 +9,7 @@ import sys
 sys.path.append("..")
 from scripts import coordinateMath
 from scripts import aStarSearch
+from scripts import determineTTS
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -87,6 +88,7 @@ class NodeView(APIView):
         
         try:
             if getType == 'get-route':
+                print("get route type get")
                 jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
                 
                 destinationNodeGuidList = []
@@ -96,15 +98,22 @@ class NodeView(APIView):
                     if node['name'] == destinationNodeName:
                         destinationNodeGuidList.append(node['guid'])
                 
+                print("right before search")
                 minCost = 40075017
                 minPath = None
+                hash = aStarSearch.genHash(jsonNodes[0].nodes)
                 for destNodeGuid in destinationNodeGuidList:
-                    path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid)
+                    print("running a star search")
+                    path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid, hash)
+                    print("a star just ran")
                     if cost < minCost:
                         minCost = cost
                         minPath = path
-                
-                return Response(minPath, status=200)
+                print("nodes:", jsonNodes[0].nodes)
+                print("min path found",minPath)
+                tts = determineTTS.tts(hash, minPath)
+                print("tts found",tts)
+                return Response({"path": minPath, "tts": tts, "nodeList": jsonNodes[0].nodes}, status=200)
 
             elif getType == 'get-buildings':
                 nodeObjects = StoreNodeData.objects.all()

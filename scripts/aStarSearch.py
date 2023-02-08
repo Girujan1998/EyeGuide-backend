@@ -1,10 +1,10 @@
 import math
 
 MAX_DISTANCE = 40075017 #meters
-def aStar(jsonNodes, start, dest):
+def aStar(jsonNodes, start, dest, hash):
 
     # hash stores a constant lookup between guid and the node itself
-    hash = genHash(jsonNodes)
+    # hash = genHash(jsonNodes)
 
     heuristic = genHeuristic(jsonNodes, hash[dest])
 
