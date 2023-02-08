@@ -83,7 +83,7 @@ class NodeView(APIView):
         getType = request.query_params.get('getType')
         buildingName = request.query_params.get('buildingName')
         floorName = request.query_params.get('floorName')
-        currentNodeName = request.query_params.get('currentLocation')
+        currentNodeName = request.query_params.get('startingNode')
         destinationNodeName = request.query_params.get('destination')
         
         try:
@@ -92,6 +92,7 @@ class NodeView(APIView):
                 jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
                 
                 destinationNodeGuidList = []
+                currentNodeGuid = None
                 for node in jsonNodes[0].nodes:
                     if node['name'] == currentNodeName:
                         currentNodeGuid = node['guid']
@@ -104,6 +105,10 @@ class NodeView(APIView):
                 hash = aStarSearch.genHash(jsonNodes[0].nodes)
                 for destNodeGuid in destinationNodeGuidList:
                     print("running a star search")
+                    print(currentNodeGuid)
+                    print(destNodeGuid)
+                    print(hash)
+                    print(jsonNodes[0].nodes)
                     path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid, hash)
                     print("a star just ran")
                     if cost < minCost:
@@ -126,14 +131,17 @@ class NodeView(APIView):
                             'buildingName': node.buildingName,
                             'floorName': [node.floorName]
                             }
+                print("got nodes from table", nodes)
                 buildingList = []
                 for buildingName in nodes:
                     buildingList.append(nodes[buildingName])
+                print("found buildings: ", buildingList)
                 result = {'nodes': buildingList}
                 return Response(result, status=200)
             elif getType == 'get-building-data':
                 nodeObjects = StoreNodeData.objects.all()
                 nodes = {}
+                print("all node objects from table",nodeObjects)
                 for node in nodeObjects:
                     
                     # filter destination nodes here

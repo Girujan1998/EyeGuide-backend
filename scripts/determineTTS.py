@@ -19,60 +19,67 @@ def tts(hash, pathData):
         direction = calculateTurn(hash[pathData[i]], hash[pathData[i+1]], hash[pathData[i+2]])
         # print("turn calculated")
 
+        print(direction)
+
 
         if direction == 'S':
-            print("straight")
+            # print("straight")
             straightCounter+=1
 
         elif direction == 'L':
-            print("left detected")
+            # print("left detected")
             if(straightCounter != 0):
-                print("have been going straight")    
+                # print("have been going straight")    
                 currNode = hash[pathData[i+1]]
                 dist = int(112000*distance(straightStartNode, currNode))
-                print("check dist > 10") 
+                # print("check dist > 10") 
                 if(dist > 10):
-                    print("appending for >10 left case") 
-                    tts.append([straightStartNode.guid, "Go straight for " + dist + " meters"])
+                    # print("appending for >10 left case") 
+                    tts.append([straightStartNode["guid"], "Go straight for " + str(dist) + " meters"])
                 
                 for j in range(i-1,0,-1):
-                    dist = (112000*distance(hash[pathData[j]], currNode))
+                    dist = int(112000*distance(hash[pathData[j]], currNode))
                     if (dist >= 2):
-                        print("appending for >2 left case") 
-                        tts.append([hash[pathData[j]].guid, "Turn left in 2 meters"])
+                        # print("appending for >2 left case") 
+                        tts.append([hash[pathData[j]]["guid"], "Turn left in 2 meters"])
                         break
-            print("appending turn left case")     
+            # print("appending turn left case")     
             tts.append([pathData[i+1],"Turn left"])
+            straightStartNode = hash[pathData[i+1]]
             straightCounter = 0
 
         elif direction == 'R':
-            print("right detected")
+            # print("right detected")
             if(straightCounter != 0):
-                print("have been going straight")    
+                # print("have been going straight")    
                 currNode = hash[pathData[i+1]]
                 dist = int(112000*distance(straightStartNode, currNode))
-                print("check dist > 10") 
+                # print("check dist > 10") 
                 if(dist > 10):
-                    print("appending for >10 right case") 
-                    tts.append([straightStartNode.guid, "Go straight for " + dist + " meters"])
+                    # print("appending for >10 right case")
+                    tts.append([straightStartNode["guid"], "Go straight for " + str(dist) + " meters"])
                 
                 for j in range(i-1,0,-1):
-                    dist = (112000*distance(hash[pathData[j]], currNode))
+                    print("j: ", j)
+                    dist = int(112000*distance(hash[pathData[j]], currNode))
+                    # print("distance calculated")
                     if (dist >= 2):
-                        print("appending for >2 right case") 
-                        tts.append([hash[pathData[j]].guid, "Turn right in 2 meters"]);
+                        # print("appending for >2 right case") 
+                        tts.append([hash[pathData[j]]["guid"], "Turn right in 2 meters"])
                         break
 
-            print("appending for turn right case") 
+            # print("appending for turn right case") 
             tts.append([pathData[i+1],"Turn right"])
+            straightStartNode = hash[pathData[i+1]]
             straightCounter = 0
-        print("current state of tts:", tts)
+        # print("current state of tts:", tts)
 
+    tts.append([pathData[len(pathData)-1], "You have arrived at " + hash[pathData[len(pathData)-1]]["name"]])
     return tts
 
 # calculates gps distance between two given nodes
 def distance (node1, node2):
-    return math.sqrt((node2.lat - node1.lat)**2 + (node2.long - node1.long)**2)
+    return math.sqrt((node2["lat"] - node1["lat"])**2 + (node2["long"] - node1["long"])**2)
 
 # given that user is traveling on node path node1 -> node2 -> node3
 # outputs whether this set of 3 nodes means user is walking straight, or turning right/left
@@ -91,7 +98,10 @@ def calculateTurn (node1, node2, node3):
 
 # determines if node3 is to the left of the line made by connecting node1 and node2
 def isLeft (node1, node2, node3):
-    return ((node2["lat"] - node1["lat"])*(node3["long"] - node1["long"]) - (node2["long"] - node1["long"])*(node3["lat"] - node1["lat"])) > 0
+    # note: will not work if building is on equator, prime meridian, or international date line
+    crossProduct = (node2["lat"] - node1["lat"])*(node3["long"] - node1["long"]) - (node2["long"] - node1["long"])*(node3["lat"] - node1["lat"])
+    condition = (node1["lat"] < 0) ^ (node1["long"] < 0)
+    return crossProduct <= 0 if condition else crossProduct > 0
 
 # calculates the angle made by the points node1, node2, node3
 def calcAngle (node1, node2, node3):
@@ -104,8 +114,6 @@ def calcAngle (node1, node2, node3):
     cosInput = 1 if cosInput > 1 else cosInput
 
     return math.acos(cosInput) * 180 / math.pi
-
-
 
 
 # determines if node3 is to the left of the line made by connecting node1 and node2
