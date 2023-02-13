@@ -9,6 +9,7 @@ import sys
 sys.path.append("..")
 from scripts import coordinateMath
 from scripts import aStarSearch
+from scripts import determineTTS
 
 class GPSView(APIView):
     def get(self, request, format=None):
@@ -82,29 +83,42 @@ class NodeView(APIView):
         getType = request.query_params.get('getType')
         buildingName = request.query_params.get('buildingName')
         floorName = request.query_params.get('floorName')
-        currentNodeName = request.query_params.get('currentLocation')
+        currentNodeName = request.query_params.get('startingNode')
         destinationNodeName = request.query_params.get('destination')
         
         try:
             if getType == 'get-route':
+                print("get route type get")
                 jsonNodes = StoreNodeData.objects.all().filter(buildingName=buildingName, floorName=floorName)
                 
                 destinationNodeGuidList = []
+                currentNodeGuid = None
                 for node in jsonNodes[0].nodes:
                     if node['name'] == currentNodeName:
                         currentNodeGuid = node['guid']
                     if node['name'] == destinationNodeName:
                         destinationNodeGuidList.append(node['guid'])
                 
+                print("right before search")
                 minCost = 40075017
                 minPath = None
+                hash = aStarSearch.genHash(jsonNodes[0].nodes)
                 for destNodeGuid in destinationNodeGuidList:
-                    path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid)
+                    print("running a star search")
+                    print(currentNodeGuid)
+                    print(destNodeGuid)
+                    print(hash)
+                    print(jsonNodes[0].nodes)
+                    path, cost = aStarSearch.aStar(jsonNodes[0].nodes, currentNodeGuid, destNodeGuid, hash)
+                    print("a star just ran")
                     if cost < minCost:
                         minCost = cost
                         minPath = path
-                
-                return Response(minPath, status=200)
+                print("nodes:", jsonNodes[0].nodes)
+                print("min path found",minPath)
+                tts = determineTTS.tts(hash, minPath)
+                print("tts found",tts)
+                return Response({"path": minPath, "tts": tts, "nodeList": jsonNodes[0].nodes}, status=200)
 
             elif getType == 'get-buildings':
                 nodeObjects = StoreNodeData.objects.all()
@@ -117,14 +131,17 @@ class NodeView(APIView):
                             'buildingName': node.buildingName,
                             'floorName': [node.floorName]
                             }
+                print("got nodes from table", nodes)
                 buildingList = []
                 for buildingName in nodes:
                     buildingList.append(nodes[buildingName])
+                print("found buildings: ", buildingList)
                 result = {'nodes': buildingList}
                 return Response(result, status=200)
             elif getType == 'get-building-data':
                 nodeObjects = StoreNodeData.objects.all()
                 nodes = {}
+                print("all node objects from table",nodeObjects)
                 for node in nodeObjects:
                     
                     # filter destination nodes here
